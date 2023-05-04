@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.tele.rpc</groupId>
+	<artifactId>t-rpc</artifactId>
+	<version>1.0.0</version>
+	<packaging>pom</packaging>
+	<name></name>
+
+    <properties>
+        <revision>1.0.0</revision>
+		<netty-version>4.1.76.Final</netty-version>
+		<curator_version>5.3.0</curator_version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.test.skip>true</maven.test.skip>
+    </properties>
+
+	<modules>
+		<module>t-rpc-registry</module>
+		<module>t-rpc-remoting</module>
+		<module>t-rpc-demo</module>
+	</modules>
+
+    <dependencies>
+
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>${netty-version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.curator</groupId>
+			<artifactId>curator-x-discovery</artifactId>
+			<version>${curator_version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.26</version>
+		</dependency>
+
+    </dependencies>
+
+</project>
