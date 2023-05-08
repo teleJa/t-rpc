@@ -9,7 +9,6 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.x.discovery.ServiceDiscovery;
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder;
 import org.apache.curator.x.discovery.ServiceInstance;
-import org.apache.curator.x.discovery.ServiceProvider;
 import org.apache.curator.x.discovery.details.JsonInstanceSerializer;
 import org.apache.curator.x.discovery.strategies.RandomStrategy;
 
@@ -26,7 +25,7 @@ public class ServiceRegistry
 {
     private final ServiceDiscovery<ServiceInfo> serviceDiscovery;
 
-    private final ConcurrentHashMap<String,ServiceProvider<ServiceInfo>> providers = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,ServiceProviderWrapper> providers = new ConcurrentHashMap<>();
 
     public ServiceRegistry(String address) {
         this(address,true);
@@ -44,7 +43,7 @@ public class ServiceRegistry
             }
             catch (InterruptedException e)
             {
-                e.printStackTrace();
+               log.error("zk connect error",e);
             }
         }
         this.serviceDiscovery = ServiceDiscoveryBuilder.builder(ServiceInfo.class)
@@ -68,31 +67,28 @@ public class ServiceRegistry
         }
         catch (Exception e)
         {
-            e.printStackTrace();
-            log.error("register service error", e);
+            log.error("register service error:", e);
         }
         return true;
     }
 
     public ServiceInfo findService(String serviceName)
     {
-        ServiceProvider<ServiceInfo> serviceProvider =
-            providers.computeIfAbsent(serviceName, this::buildProvider);
+        ServiceProviderWrapper serviceProviderWrapper = providers.computeIfAbsent(serviceName, this::buildProvider);
         try
         {
-            serviceProvider.start();
-            return serviceProvider.getInstance().getPayload();
+            return serviceProviderWrapper.provider().getInstance().getPayload();
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            log.error("find service error:", e);
         }
         throw new RuntimeException("no service available");
     }
 
-    private ServiceProvider<ServiceInfo> buildProvider(String serviceName)
+    private ServiceProviderWrapper buildProvider(String serviceName)
     {
-        return serviceDiscovery.serviceProviderBuilder().serviceName(serviceName).providerStrategy(new RandomStrategy<>()).build();
+        return new ServiceProviderWrapper(serviceDiscovery.serviceProviderBuilder().serviceName(serviceName).providerStrategy(new RandomStrategy<>()).build());
     }
 
 }

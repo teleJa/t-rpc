@@ -21,6 +21,8 @@ public class ServiceInfo
 
     private String name;
 
+    private Class<?> clazz;
+
     private String version = "1.0";
 
     public ServiceInfo()
