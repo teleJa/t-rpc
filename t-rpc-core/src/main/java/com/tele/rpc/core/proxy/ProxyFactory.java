@@ -1,4 +1,4 @@
-package com.tele.rpc.remoting.proxy;
+package com.tele.rpc.core.proxy;
 
 import lombok.experimental.UtilityClass;
 
