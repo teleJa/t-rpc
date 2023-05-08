@@ -7,12 +7,15 @@
 	<artifactId>t-rpc</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
-	<name></name>
+	<name>t-rpc</name>
 
     <properties>
         <revision>1.0.0</revision>
 		<netty-version>4.1.76.Final</netty-version>
 		<curator_version>5.3.0</curator_version>
+		<lombok_version>1.18.26</lombok_version>
+		<hessian_version>4.0.66</hessian_version>
+
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.encoding>UTF-8</maven.compiler.encoding>
@@ -44,9 +47,16 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.26</version>
+			<version>${lombok_version}</version>
 		</dependency>
 
-    </dependencies>
+		<dependency>
+			<groupId>com.caucho</groupId>
+			<artifactId>hessian</artifactId>
+			<version>${hessian_version}</version>
+		</dependency>
+
+
+	</dependencies>
 
 </project>

@@ -3,6 +3,7 @@ package com.tele.rpc.remoting.proxy;
 import lombok.experimental.UtilityClass;
 
 import java.lang.reflect.Proxy;
+import java.util.Map;
 
 /**
  * @author tele
@@ -12,8 +13,8 @@ import java.lang.reflect.Proxy;
 @UtilityClass
 public class ProxyFactory
 {
-    public static <T> T getProxy(Class<T> interfaces)
+    public static <T> T getProxy(Class<T> interfaces, Map<String,String> params)
     {
-        return (T)Proxy.newProxyInstance(interfaces.getClassLoader(), new Class[]{interfaces}, new ProxyHandler());
+        return (T)Proxy.newProxyInstance(interfaces.getClassLoader(), new Class[]{interfaces}, new ProxyHandler(params));
     }
 }
