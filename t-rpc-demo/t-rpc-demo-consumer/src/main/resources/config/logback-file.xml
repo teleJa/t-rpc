@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration debug="false">
+    <property name="APP_NAME" value="t-rpc-registry" />
+    <property name="LOG_HOME" value="${user.dir}/logs" />
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${APP_NAME}.log</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${FILE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/${APP_NAME}.%d{yyyy-MM-dd}-%i.log.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>20GB</totalSizeCap>
+            <maxFileSize>100MB</maxFileSize>
+            <cleanHistoryOnStart>true</cleanHistoryOnStart>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 级别依次为【从高到低】：ALL > TRACE > FATAL > DEBUG > INFO > WARN > ERROR > OFF  -->
+    <logger name="com.tele" level="DEBUG"/>
+    <root level="WARN">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>

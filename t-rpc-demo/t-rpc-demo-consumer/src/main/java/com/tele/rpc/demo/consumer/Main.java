@@ -1,7 +1,7 @@
 package com.tele.rpc.demo.consumer;
 
-import com.tele.rpc.registry.model.ServiceInfo;
-import com.tele.rpc.registry.zk.ServiceRegistry;
+import com.tele.rpc.core.ReferenceBean;
+import com.tele.rpc.demo.provider.demo.DemoService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.CountDownLatch;
@@ -17,8 +17,18 @@ public class Main
     public static void main(String[] args)
         throws InterruptedException
     {
-        ServiceRegistry serviceRegistry = new ServiceRegistry("127.0.0.1:32772");
-        ServiceInfo demoService = serviceRegistry.findService("demoService");
+        String address = "127.0.0.1:32772";
+        ReferenceBean<DemoService> referenceBean = new ReferenceBean<>();
+        referenceBean.setInterfaces(DemoService.class);
+        referenceBean.setRegistryAddress(address);
+
+        DemoService service = referenceBean.getService();
+
+        for (int i = 0; i < 3; i++)
+        {
+            service.sayHello("hello");
+        }
+
         new CountDownLatch(1).await();
     }
 }

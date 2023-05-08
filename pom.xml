@@ -28,7 +28,8 @@
 		<module>t-rpc-registry</module>
 		<module>t-rpc-remoting</module>
 		<module>t-rpc-demo</module>
-	</modules>
+        <module>t-rpc-core</module>
+    </modules>
 
     <dependencies>
 

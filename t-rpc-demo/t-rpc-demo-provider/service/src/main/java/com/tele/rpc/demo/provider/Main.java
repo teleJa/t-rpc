@@ -1,9 +1,12 @@
 package com.tele.rpc.demo.provider;
 
-import com.tele.rpc.registry.model.ServiceInfo;
-import com.tele.rpc.registry.zk.ServiceRegistry;
+import com.tele.rpc.core.ApplicationConfig;
+import com.tele.rpc.core.ServiceBean;
+import com.tele.rpc.core.constants.RpcConstants;
+import com.tele.rpc.demo.provider.demo.DemoService;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -18,14 +21,19 @@ public class Main
         throws InterruptedException
     {
 
-        ServiceRegistry serviceRegistry = new ServiceRegistry("127.0.0.1:32772");
+        Properties properties = new Properties();
+        properties.setProperty(RpcConstants.BIND_IP,"192.168.1.103");
+        properties.setProperty(RpcConstants.BIND_PORT,"8080");
 
-        String ip = "127.0.0.1";
-        ServiceInfo demoService = new ServiceInfo();
-        demoService.setName("demoService");
-        demoService.setIp(ip);
-        demoService.setPort(8080);
-        serviceRegistry.register(demoService);
+        ApplicationConfig.init(properties);
+
+        ServiceBean<DemoService> serviceBean = new ServiceBean<>();
+        serviceBean.setServiceName("com.tele.rpc.demo.provider.demo.DemoService");
+        serviceBean.setVersion("1.0");
+        serviceBean.setClazz(DemoService.class);
+        serviceBean.setRef(new DemoServiceImpl());
+        serviceBean.setRegisterAddress("127.0.0.1:32772");
+        serviceBean.export();
 
         new CountDownLatch(1).await();
 
