@@ -15,6 +15,7 @@
 		<curator_version>5.3.0</curator_version>
 		<lombok_version>1.18.26</lombok_version>
 		<hessian_version>4.0.66</hessian_version>
+		<commons_lang3_version>3.12.0</commons_lang3_version>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -55,6 +56,12 @@
 			<groupId>com.caucho</groupId>
 			<artifactId>hessian</artifactId>
 			<version>${hessian_version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${commons_lang3_version}</version>
 		</dependency>
 
 

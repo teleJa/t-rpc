@@ -12,6 +12,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -45,41 +46,43 @@ public class NettyServer
         if (started.compareAndSet(false, true))
         {
 
-           new Thread(()-> {
-               worker = new NioEventLoopGroup();
-               boss = new NioEventLoopGroup();
-               ServerBootstrap serverBootstrap = new ServerBootstrap();
-               serverBootstrap.group(boss, worker)
-                   .handler(new LoggingHandler(LogLevel.DEBUG))
-                   .channel(NioServerSocketChannel.class)
-                   .childHandler(new ChannelInitializer<SocketChannel>()
-                   {
-                       @Override
-                       protected void initChannel(SocketChannel ch)
-                           throws Exception
-                       {
-                           ch.pipeline()
-                               .addLast(new ResponseEncoder())
-                               .addLast(new RequestDecoder())
-                               .addLast(new ServerHandler(new HostInfo(ip, port)))
-                               .addLast(new LoggingHandler(LogLevel.DEBUG));
-                       }
-                   });
+            Thread serverThread = new Thread(() -> {
+                worker = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() + 1,new BasicThreadFactory.Builder().namingPattern("server-worker-%d").daemon(true).build());
+                boss = new NioEventLoopGroup(1,new BasicThreadFactory.Builder().namingPattern("server-boss-%d").daemon(true).build());
+                ServerBootstrap serverBootstrap = new ServerBootstrap();
+                serverBootstrap.group(boss, worker)
+                    .handler(new LoggingHandler(LogLevel.DEBUG))
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>()
+                    {
+                        @Override
+                        protected void initChannel(SocketChannel ch)
+                            throws Exception
+                        {
+                            ch.pipeline()
+                                .addLast(new ResponseEncoder())
+                                .addLast(new RequestDecoder())
+                                .addLast(new ServerHandler(new HostInfo(ip, port)))
+                                .addLast(new LoggingHandler(LogLevel.DEBUG));
+                        }
+                    });
 
-               try
-               {
-                   ChannelFuture channelFuture = serverBootstrap.bind(ip, port).sync();
-                   if (channelFuture.isSuccess())
-                   {
-                       log.info("server start success");
-                   }
-                   channelFuture.channel().closeFuture().sync();
-               }
-               catch (InterruptedException e)
-               {
-                   log.error("server start fail", e);
-               }
-           }).start();
+                try
+                {
+                    ChannelFuture channelFuture = serverBootstrap.bind(ip, port).sync();
+                    if (channelFuture.isSuccess())
+                    {
+                        log.info("server start success");
+                    }
+                    channelFuture.channel().closeFuture().sync();
+                }
+                catch (InterruptedException e)
+                {
+                    log.error("server start fail", e);
+                }
+            }, "server-thread");
+            serverThread.setDaemon(true);
+            serverThread.start();
 
         }
 

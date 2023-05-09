@@ -16,6 +16,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -49,8 +50,9 @@ public class NettyClient
     {
         if (started.compareAndSet(false, true))
         {
-            new Thread(()-> {
-                worker = new NioEventLoopGroup();
+            Thread workThread = new Thread(() -> {
+                worker = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() + 1,
+                    new BasicThreadFactory.Builder().namingPattern("client-worker-%d").daemon(true).build());
                 Bootstrap bootstrap = new Bootstrap();
                 bootstrap.group(worker).channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true)
                     .handler(new ChannelInitializer<SocketChannel>()
@@ -69,7 +71,8 @@ public class NettyClient
                 try
                 {
                     ChannelFuture channelFuture = bootstrap.connect(hostInfo.getIp(), hostInfo.getPort()).sync();
-                    if(channelFuture.isSuccess()) {
+                    if (channelFuture.isSuccess())
+                    {
                         log.debug("connect to server success");
                         this.channel = channelFuture.channel();
                         latch.countDown();
@@ -81,15 +84,9 @@ public class NettyClient
                 {
                     log.error("client start error:", e);
                 }
-            }).start();
-            try
-            {
-                latch.await(10, TimeUnit.SECONDS);
-            }
-            catch (InterruptedException e)
-            {
-                // ignore
-            }
+            },"work-thread");
+            workThread.setDaemon(true);
+            workThread.start();
         }
     }
 
@@ -97,6 +94,8 @@ public class NettyClient
     {
         try
         {
+            // client may not start success
+            latch.await(10, TimeUnit.SECONDS);
             this.channel.writeAndFlush(request).sync();
         }
         catch (InterruptedException e)
